@@ -3,4 +3,4 @@
 . ./setrepo
 
 echo Pushing "${REPO_PATH} to hub.docker.com"
-docker push "${REPO_PATH}" .
+docker push "${REPO_PATH}"
