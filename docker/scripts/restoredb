@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ -n "$MYSQL_HOST" ]; then
+  echo -n 'MYSQL_HOST not defined'
+  exit 1
+fi
+if [ -n "$MYSQL_USER" ]; then
+  echo -n 'MYSQL_USER not defined'
+  exit 1
+fi
+if [ -n "$MYSQL_DB" ]; then
+  echo -n 'MYSQL_DB not defined'
+  exit 1
+fi
+
+if [ -d "$APP_DB" ]; then
+
+  echo -n "## Restoring Database"
+
+  echo -n "Creating database: ${MYSQL_DB}"
+  [ -z "$MYSQL_ROOT_PW" ] || ROOTPW="-p${MYSQL_ROOT_PW}"
+  mysql -h "${MYSQL_HOST}" -u root "$ROOTPW" < "${APP_DB}/dbcreate.sql"
+
+  for i in `ls ${APP_DB}`; do
+    if [ "$i" != "dbcreate.sql" ]; then
+      echo "Loading: ${i}"
+      [ -z "$MYSQL_USER_PW" ] || USERPW="-p${MYSQL_USER_PW}"
+      mysql -h "${MYSQL_HOST}" -u "$MYSQL_USER" "$USERPW" "$MYSQL_DB" < "${APP_DB}/${i}"
+      #mysql -u socialengine -pyNW4TKgr68wsLA socialengine < socialengine.sql
+    fi
+  done
+
+else
+  echo "Can't restore database: ${APP_DB} not found"
+  exit 1
+fi

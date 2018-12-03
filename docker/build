@@ -1,0 +1,6 @@
+#!/bin/bash
+
+. ./setrepo
+
+echo Building "${REPO_PATH}"
+docker build -t "${REPO_PATH}" .

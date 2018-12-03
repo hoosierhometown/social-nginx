@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export REPO_ORG="tinkery"
+export CONTAINER_NAME="social-nginx"
+export REPO_TAG="latest"
+export REPO_PATH="${REPO_ORG}/${CONTAINER_NAME}:${REPO_TAG}"

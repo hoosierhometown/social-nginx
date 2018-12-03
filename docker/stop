@@ -1,0 +1,8 @@
+#!/bin/bash
+
+. ./setrepo
+
+echo -n "Stopping: "
+docker stop "${CONTAINER_NAME}"
+echo -n "Removing: "
+docker rm "${CONTAINER_NAME}"

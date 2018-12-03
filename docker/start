@@ -1,0 +1,12 @@
+#!/bin/bash
+
+. ./setrepo
+
+echo Starting "${CONTAINER_NAME} on port 80"
+docker run -d --name "${CONTAINER_NAME}" -p 80:80 "${REPO_PATH}"
+
+echo "Waiting for container to start..."
+sleep 3
+
+echo "Launching default browser to http://localhost:80"
+open "http://localhost:80"

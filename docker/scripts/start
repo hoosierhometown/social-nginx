@@ -1,0 +1,298 @@
+#!/bin/bash
+
+# Escape codes for ANSI colored error messages
+RED='\033[0;31m'
+NC='\033[0m'
+
+# Directory Structure
+# /start.sh       This startup script
+# /util           Utility scripts
+# /app            The application root ($APP_HOME)
+# /app/src        SocialEngine app root, installed from source control
+#                 or mapped to the docker volume ($WWW_ROOT)
+# /app/conf       Base for version-dependent configuration ($APP_CONF)
+# /app/conf/db    Database initialization data files, from version
+#                 control ($APP_DB)
+# /app/conf/init  Custom initialization scripts, from version control
+#                 ($APP_INIT)
+
+echo -e "###############################"
+echo -e "##   SocialEngine on NGINX   ##"
+echo -e "###############################\n"
+
+if [ -e /.firstrun ]; then
+  echo -e "## Initializing social-nginx\n"
+else
+  echo -e "## Restarting social-nginx\n"
+fi
+
+DEVELOPMENT='DEVELOPMENT'
+PRODUCTION='PRODUCTION'
+if [ -z "$SE_MODE" ]; then
+  export SE_MODE="$DEVELOPMENT"
+else
+  if [ "$SE_MODE" != "$PRODUCTION" ] && [ "$SE_MODE" != "$DEVELOPMENT" ]; then
+    echo -e "${RED}Invalid SE_MODE: ${SE_MODE}\n" \
+            "SE_MODE must be DEVELOPMENT or PRODUCTION${NC}"
+    exit 1
+  fi
+fi
+echo -e "Run Mode (SE_MODE): ${SE_MODE}"
+echo -e "App home: ${APP_HOME}"
+echo -e "WWW Root: ${WWW_ROOT}"
+
+# Disable Strict Host checking for non interactive git clones
+# Todo: needed?
+#mkdir -p -m 0700 /root/.ssh
+#echo -e "Host *\n\tStrictHostKeyChecking no\n" > /root/.ssh/config
+
+if [ -e /.firstrun ]; then
+
+  # Setup git environment
+  if [ -n "$GIT_EMAIL" ]; then
+    echo -e "Setting git global user.email: ${GIT_EMAIL}"
+    git config --global user.email "$GIT_EMAIL"
+  fi
+  if [ -n "$GIT_NAME" ]; then
+    echo -e "Setting git global user.name: ${GIT_NAME}"
+    git config --global user.name "$GIT_NAME"
+  fi
+  # Ensure upstream branch is the same as local branch
+  git config --global push.default simple
+  # Don't track file mode changes
+  git config --global core.fileMode false
+
+  # Setup the app source. Options are
+  # 1) The code already exists (loaded through an attached Docker volume)
+  #    This is determined by the presence of boot.php in $WWW_ROOT
+  # 2) Otherwise, load from the Git repository specified by $GIT_REPO
+  # 3) If $GIT_REPO not specified, then run the default index.php
+  if [ -e ${WWW_ROOT}/boot.php ]; then
+    # Use the app source mapped in through the docker volume
+    if [ -n "${GIT_REPO}" ]; then
+      # A Git repo was specified, but won't be used
+      echo -e "${RED}Ignoring GIT_REPO: ${GIT_REPO}${NC}"
+    fi
+    echo -e "## Running mounted app source in ${WWW_ROOT}"
+  else
+    if [ -n "$GIT_REPO" ]; then
+      echo -e "## Loading source from (GIT_REPO): ${GIT_REPO}"
+      # remove existing files
+      rm -rf "${WWW_ROOT}/*"
+      # Setup the Git command
+      GIT_COMMAND='git clone'
+      if [ -n "$GIT_BRANCH" ]; then
+        echo -e "Git branch (GIT_BRANCH): ${GIT_BRANCH}"
+        GIT_COMMAND="${GIT_COMMAND} -b ${GIT_BRANCH}"
+      fi
+      if [ -z "$GIT_USERNAME" ] && [ -z "$GIT_PERSONAL_TOKEN" ]; then
+        GIT_COMMAND="${GIT_COMMAND} ${GIT_REPO}"
+      else
+        echo -e "Git Username (GIT_USERNAME): ${GIT_USERNAME}"
+        echo -e "Git Token (GIT_PERSONAL_TOKEN): ${GIT_PERSONAL_TOKEN}"
+        GIT_COMMAND="${GIT_COMMAND} https://${GIT_USERNAME}:${GIT_PERSONAL_TOKEN}@${GIT_REPO}"
+      fi
+      # Execute the git clone
+      ${GIT_COMMAND} "${APP_HOME}" || exit 1
+      if [ -n "$GIT_TAG" ]; then
+        echo -e "Checking out tag (GIT_TAG): ${GIT_TAG}"
+        git checkout ${GIT_TAG} || exit 1
+      fi
+    else
+      echo -e "## Using sample index.php in ${WWW_ROOT}"
+    fi
+  fi
+fi
+
+if [ -d "${WWW_ROOT}/.git" ]; then
+  # Display info if this is a git repo
+  echo "## Git repo details"
+  git remote show origin
+fi
+
+if [ -e /.firstrun ]; then
+
+  if [ -e ${WWW_ROOT}/boot.php ]; then
+    # Set up SocialEngine temporary folders
+    # I'm not sure if all of these directories are needed,
+    # of if SE would create them automatically, but just to make sure
+    # I'm creating them here.
+    echo "Configuring SE temp folders"
+    [ -d "${SE_TMP}" ] || mkdir "${SE_TMP}"
+    [ -d "${SE_TMP}/backup" ] || mkdir "${SE_TMP}/backup"
+    [ -d "${SE_TMP}/log" ] || mkdir "${SE_TMP}/log"
+    [ -d "${SE_TMP}/log/scaffold" ] || mkdir "${SE_TMP}/log"
+    [ -d "${SE_TMP}/package" ] || mkdir "${SE_TMP}/package"
+    [ -d "${SE_TMP}/package/archives" ] || mkdir "${SE_TMP}/package/archives"
+    [ -d "${SE_TMP}/package/manifests" ] || mkdir "${SE_TMP}/package/manifests"
+    [ -d "${SE_TMP}/package/packages" ] || mkdir "${SE_TMP}/package/packages"
+    [ -d "${SE_TMP}/package/repositories" ] || mkdir "${SE_TMP}/package/repositories"
+    [ -d "${SE_TMP}/package/sdk" ] || mkdir "${SE_TMP}/package/sdk"
+    [ -d "${SE_TMP}/scaffold" ] || mkdir "${SE_TMP}/scaffold"
+    [ -d "${SE_TMP}/session" ] || mkdir "${SE_TMP}/session"
+
+    # Set file/directory owner and permissions
+    echo "Configuring file properties"
+    chown -Rf nginx.nginx "$WWW_ROOT"
+    chmod -R 0755 "${WWW_ROOT}"
+    chmod -R 0777 "${WWW_ROOT}/install/config/"
+    chmod -R 0777 "${WWW_ROOT}/temporary/"
+    chmod -R 0777 "${WWW_ROOT}/public/"
+    chmod -R 0777 "${WWW_ROOT}/application/themes/"
+    chmod -R 0777 "${WWW_ROOT}/application/packages/"
+    chmod -R 0777 "${WWW_ROOT}/application/languages/"
+    chmod -R 0777 "${WWW_ROOT}/application/settings/"
+    chmod 0777 "${WWW_ROOT}/application/modules/"
+    chmod 0644 "${WWW_ROOT}/index.php"
+    chmod 0644 "${WWW_ROOT}/application/index.php"
+    chmod 0644 "${WWW_ROOT}/install/index.php"
+  fi
+  
+  # Enable custom nginx config files if they exist
+  # echo "## Configuring NGINX"
+  # if [ -f "${APP_CONF}/nginx/nginx.conf" ]; then
+  #  cp "${APP_CONF}/nginx/nginx.conf" /etc/nginx/nginx.conf
+  #fi
+  #if [ -f "${APP_CONF}/nginx/nginx-site.conf" ]; then
+  #  cp "${APP_CONF}/nginx/nginx-site.conf" /etc/nginx/sites-available/default.conf
+  #fi
+  #if [ -f "${APP_CONF}/nginx/nginx-site-ssl.conf" ]; then
+  #  cp "${APP_CONF}/nginx/nginx-site-ssl.conf" /etc/nginx/sites-available/default-ssl.conf
+  #fi
+
+  echo "## Configuring PHP"
+  # Prevent config files from being filled to infinity by force of stop and restart the container
+  lastlinephpconf="$(grep "." /usr/local/etc/php-fpm.conf | tail -1)"
+  if [[ $lastlinephpconf == *"php_flag[display_errors]"* ]]; then
+   sed -i '$ d' /usr/local/etc/php-fpm.conf
+  fi
+
+  # Display PHP error's or not
+  if [[ "$ERRORS" != "1" ]] ; then
+    echo php_flag[display_errors] = off >> /usr/local/etc/php-fpm.conf
+  else
+    echo php_flag[display_errors] = on >> /usr/local/etc/php-fpm.conf
+  fi
+  #Display errors in docker logs
+  if [ ! -z "$PHP_ERRORS_STDERR" ]; then
+    echo "log_errors = On" >> /usr/local/etc/php/conf.d/docker-vars.ini
+    echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/docker-vars.ini
+  fi
+
+  # Increase the memory_limit
+  if [ ! -z "$PHP_MEM_LIMIT" ]; then
+   sed -i "s/memory_limit = 128M/memory_limit = ${PHP_MEM_LIMIT}M/g" /usr/local/etc/php/conf.d/docker-vars.ini
+  fi
+
+  # Increase the post_max_size
+  if [ ! -z "$PHP_POST_MAX_SIZE" ]; then
+   sed -i "s/post_max_size = 100M/post_max_size = ${PHP_POST_MAX_SIZE}M/g" /usr/local/etc/php/conf.d/docker-vars.ini
+  fi
+
+  # Increase the upload_max_filesize
+  if [ ! -z "$PHP_UPLOAD_MAX_FILESIZE" ]; then
+   sed -i "s/upload_max_filesize = 100M/upload_max_filesize= ${PHP_UPLOAD_MAX_FILESIZE}M/g" /usr/local/etc/php/conf.d/docker-vars.ini
+  fi
+
+  # Enable xdebug
+  XdebugFile='/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini'
+  if [[ "$ENABLE_XDEBUG" == "1" ]] ; then
+    if [ -f $XdebugFile ]; then
+    	echo "Xdebug enabled"
+    else
+    	echo "Enabling xdebug"
+    	echo "If you get this error, you can safely ignore it: /usr/local/bin/docker-php-ext-enable: line 83: nm: not found"
+    	# see https://github.com/docker-library/php/pull/420
+      docker-php-ext-enable xdebug
+      # see if file exists
+      if [ -f $XdebugFile ]; then
+          # See if file contains xdebug text.
+          if grep -q xdebug.remote_enable "$XdebugFile"; then
+              echo "Xdebug already enabled... skipping"
+          else
+              echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > $XdebugFile # Note, single arrow to overwrite file.
+              echo "xdebug.remote_enable=1 "  >> $XdebugFile
+              echo "xdebug.remote_log=/tmp/xdebug.log"  >> $XdebugFile
+              echo "xdebug.remote_autostart=false "  >> $XdebugFile # I use the xdebug chrome extension instead of using autostart
+              # NOTE: xdebug.remote_host is not needed here if you set an environment variable in docker-compose like so `- XDEBUG_CONFIG=remote_host=192.168.111.27`.
+              #       you also need to set an env var `- PHP_IDE_CONFIG=serverName=docker`
+          fi
+      fi
+    fi
+  else
+      if [ -f $XdebugFile ]; then
+          echo "Disabling Xdebug"
+        rm $XdebugFile
+      fi
+  fi
+
+  echo "## Configuring NGINX"
+  # Display Version Details or not
+  if [[ "$HIDE_NGINX_HEADERS" == "0" ]] ; then
+   sed -i "s/server_tokens off;/server_tokens on;/g" /etc/nginx/nginx.conf
+  else
+   sed -i "s/expose_php = On/expose_php = Off/g" /usr/local/etc/php-fpm.conf
+  fi
+
+  # Pass real-ip to logs when behind ELB, etc
+  if [[ "$REAL_IP_HEADER" == "1" ]] ; then
+   sed -i "s/#real_ip_header X-Forwarded-For;/real_ip_header X-Forwarded-For;/" /etc/nginx/sites-available/default.conf
+   sed -i "s/#set_real_ip_from/set_real_ip_from/" /etc/nginx/sites-available/default.conf
+   if [ ! -z "$REAL_IP_FROM" ]; then
+    sed -i "s#172.16.0.0/12#$REAL_IP_FROM#" /etc/nginx/sites-available/default.conf
+   fi
+  fi
+  # Do the same for SSL sites
+  if [ -f /etc/nginx/sites-available/default-ssl.conf ]; then
+   if [[ "$REAL_IP_HEADER" == "1" ]] ; then
+    sed -i "s/#real_ip_header X-Forwarded-For;/real_ip_header X-Forwarded-For;/" /etc/nginx/sites-available/default-ssl.conf
+    sed -i "s/#set_real_ip_from/set_real_ip_from/" /etc/nginx/sites-available/default-ssl.conf
+    if [ ! -z "$REAL_IP_FROM" ]; then
+     sed -i "s#172.16.0.0/12#$REAL_IP_FROM#" /etc/nginx/sites-available/default-ssl.conf
+    fi
+   fi
+  fi
+
+  # Run custom scripts
+  # Todo: allow init variants?
+  if [[ "$RUN_SCRIPTS" != "0" ]] ; then
+    if [ -d "${APP_INIT}" ]; then
+      # make scripts executable incase they aren't
+      chmod -Rf 750 "${APP_INIT}/*"; sync;
+      # run scripts in number order
+      for i in `ls ${APP_INIT}`; do "${APP_INIT}/${i}" ; done
+    fi
+  fi
+
+  #if [ -z "$SKIP_COMPOSER" ]; then
+  #    # Try auto install for composer
+  #    if [ -f "/var/www/html/composer.lock" ]; then
+  #        if [ "$APPLICATION_ENV" == "development" ]; then
+  #            composer global require hirak/prestissimo
+  #            composer install --working-dir=/var/www/html
+  #        else
+  #            composer global require hirak/prestissimo
+  #            composer install --no-dev --working-dir=/var/www/html
+  #        fi
+  #    fi
+  #fi
+
+  if [ "$SE_MODE" == "$DEVELOPMENT" ]; then
+    if [ -d "${APP_DB}" ]; then
+      # Initialize the database
+      restoredb
+    fi
+    echo '## Running in DEVELOPMENT mode'
+  else
+    # remove directories not used in production
+    echo '## Running in PRODUCTION mode'
+  fi
+
+  # Used to flag that initialiation has completed,
+  # to skip init if the container is restarted
+  rm /.firstrun
+fi
+
+# Start supervisord and services
+echo -n "## Starting services"
+exec /usr/bin/supervisord -n -c /etc/supervisord.conf
