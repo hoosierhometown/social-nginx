@@ -87,11 +87,13 @@ if [ -e /.firstrun ]; then
         GIT_COMMAND="${GIT_COMMAND} -b ${GIT_BRANCH}"
       fi
       if [ -z "$GIT_USERNAME" ] && [ -z "$GIT_PERSONAL_TOKEN" ]; then
-        GIT_COMMAND="${GIT_COMMAND} https://${GIT_REPO}"
+        GIT_COMMAND="${GIT_COMMAND} ${GIT_REPO}"
       else
         echo -e "Git Username (GIT_USERNAME): ${GIT_USERNAME}"
         echo -e "Git Token (GIT_PERSONAL_TOKEN): ${GIT_PERSONAL_TOKEN}"
-        GIT_COMMAND="${GIT_COMMAND} https://${GIT_USERNAME}:${GIT_PERSONAL_TOKEN}@${GIT_REPO}"
+        REPO=`echo "$GIT_REPO" | \
+          sed -e "s/https\:\/\//https\:\/\/${GIT_USERNAME}:${GIT_PERSONAL_TOKEN}@/g"`
+        GIT_COMMAND="${GIT_COMMAND} ${REPO}"
       fi
       # Execute the git clone
       ${GIT_COMMAND} "${APP_HOME}" || exit 1

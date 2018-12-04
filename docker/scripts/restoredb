@@ -19,15 +19,16 @@ if [ -d "$APP_DB" ]; then
 
   echo "Creating database: ${MYSQL_DB}"
   [ -z "$MYSQL_ROOT_PW" ] || ROOTPW="-p${MYSQL_ROOT_PW}"
-  mysql -h "${MYSQL_HOST}" -u root "$ROOTPW" < "${APP_DB}/dbcreate.sql"
+  mysql -h "${MYSQL_HOST}" -u root "$ROOTPW" -e \
+    "DROP DATABASE IF EXISTS ${MYSQL_DB}; \
+     CREATE DATABASE ${MYSQL_DB}; \
+     GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_USER_PW}';"
 
   for i in `ls ${APP_DB}`; do
-    if [ "$i" != "dbcreate.sql" ]; then
-      echo "Loading: ${i}"
-      [ -z "$MYSQL_USER_PW" ] || USERPW="-p${MYSQL_USER_PW}"
-      mysql -h "${MYSQL_HOST}" -u "$MYSQL_USER" "$USERPW" "$MYSQL_DB" < "${APP_DB}/${i}"
-      #mysql -u socialengine -pyNW4TKgr68wsLA socialengine < socialengine.sql
-    fi
+    echo "Loading: ${i}"
+    [ -z "$MYSQL_USER_PW" ] || USERPW="-p${MYSQL_USER_PW}"
+    mysql -h "${MYSQL_HOST}" -u "$MYSQL_USER" "$USERPW" "$MYSQL_DB" < "${APP_DB}/${i}"
+    #mysql -u socialengine -pyNW4TKgr68wsLA socialengine < socialengine.sql
   done
 
 else
