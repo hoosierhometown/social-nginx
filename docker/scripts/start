@@ -122,7 +122,7 @@ if [ -e /.firstrun ]; then
     [ -d "${SE_TMP}" ] || mkdir "${SE_TMP}"
     [ -d "${SE_TMP}/backup" ] || mkdir "${SE_TMP}/backup"
     [ -d "${SE_TMP}/log" ] || mkdir "${SE_TMP}/log"
-    [ -d "${SE_TMP}/log/scaffold" ] || mkdir "${SE_TMP}/log"
+    [ -d "${SE_TMP}/log/scaffold" ] || mkdir "${SE_TMP}/log/scaffold"
     [ -d "${SE_TMP}/package" ] || mkdir "${SE_TMP}/package"
     [ -d "${SE_TMP}/package/archives" ] || mkdir "${SE_TMP}/package/archives"
     [ -d "${SE_TMP}/package/manifests" ] || mkdir "${SE_TMP}/package/manifests"
