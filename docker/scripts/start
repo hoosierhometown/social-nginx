@@ -78,7 +78,7 @@ if [ -e /.firstrun ]; then
     if [ -n "$GIT_REPO" ]; then
       echo -e "## Loading source from (GIT_REPO): ${GIT_REPO}"
       # remove existing files
-      rm -rf "${WWW_ROOT}/*"
+      rm -rf "${APP_HOME}/*"
       # Setup the Git command
       GIT_COMMAND='git clone'
       if [ -n "$GIT_BRANCH" ]; then
@@ -147,7 +147,7 @@ if [ -e /.firstrun ]; then
     chmod 0644 "${WWW_ROOT}/application/index.php"
     chmod 0644 "${WWW_ROOT}/install/index.php"
   fi
-  
+
   # Enable custom nginx config files if they exist
   # echo "## Configuring NGINX"
   # if [ -f "${APP_CONF}/nginx/nginx.conf" ]; then

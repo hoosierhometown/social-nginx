@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./setrepo
+. dev/setrepo
 
 echo -n "Stopping: "
 docker stop "${CONTAINER_NAME}"

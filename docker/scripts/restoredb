@@ -1,23 +1,23 @@
 #!/bin/bash
 
-if [ -n "$MYSQL_HOST" ]; then
-  echo -n 'MYSQL_HOST not defined'
+if [ -z "$MYSQL_HOST" ]; then
+  echo 'MYSQL_HOST not defined'
   exit 1
 fi
-if [ -n "$MYSQL_USER" ]; then
-  echo -n 'MYSQL_USER not defined'
+if [ -z "$MYSQL_USER" ]; then
+  echo 'MYSQL_USER not defined'
   exit 1
 fi
-if [ -n "$MYSQL_DB" ]; then
-  echo -n 'MYSQL_DB not defined'
+if [ -z "$MYSQL_DB" ]; then
+  echo 'MYSQL_DB not defined'
   exit 1
 fi
 
 if [ -d "$APP_DB" ]; then
 
-  echo -n "## Restoring Database"
+  echo "## Restoring Database"
 
-  echo -n "Creating database: ${MYSQL_DB}"
+  echo "Creating database: ${MYSQL_DB}"
   [ -z "$MYSQL_ROOT_PW" ] || ROOTPW="-p${MYSQL_ROOT_PW}"
   mysql -h "${MYSQL_HOST}" -u root "$ROOTPW" < "${APP_DB}/dbcreate.sql"
 
