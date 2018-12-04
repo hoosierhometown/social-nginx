@@ -5,13 +5,13 @@ This image supports modern DevOps workflows around SE, using a Docker container 
 This initial version is a work in progress. I currently don't have SSL set up (though that shouldn't be difficult). I'm currently in early development on a SocialEngine site so I'll be updating this as I go. I would welcome others to fork this repository, and contribute your improvements through pull requests. If you experience problems, you may also open an issue on the Github project page.
 Next steps:
 * Implement SSL
-* Optimize and clean up NGINX & PHP config. Perhaps break PHP-FPM into a separate container?
-* Optimize & harden directory permissions for dev & production.
+* Optimize and clean up NGINX & PHP config. Perhaps break PHP-FPM into a separate container? Make sure there's no rewrite issues.
 * Incorporate other PHP modules as needed
+* Optimize & harden directory permissions for dev & production.
 * Test on GCP Kubernetes Engine
 * Implement a test harness for automated testing
-* Implement a database migration strategy, supporting continuous delivery all the way into production.
-* Automate CD using Jenkins or a cloud DevOps pipeline
+* Implement a database migration tool, supporting continuous delivery all the way into production, including schema and data changes.
+* Automate CI/CD using Jenkins or a cloud DevOps pipeline
 * Test on AWS and Azure
 * Update social-nginx docs
 This will result in full Continuous Integration and Delivery of even large SocialEngine installations, while enabling developers to easily work on isolated feature branches.
@@ -31,12 +31,14 @@ Running SocialEngine in social-nginx the first time requires some setup. You mus
 5. Create a backup of your database. Note there is no space between -p and your password. Execute: `mysqldump -h YOUR_MYSQL_HOST -u root -pROOT_PASSWORD YOUR_DATABASE_NAME > ~/default.sql`
 6. You'll want to download socialengine.tgz and default.sql from the home (~/) directory to your local computer. These instructions presume these are downloaded into ~/Downloads/socialengine.tgz and ~/Downloads/default.sql, but if they are in a different location you can just adjust the paths.
 7. [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) if you don't have it.
-8. Create a project directory: `mkdir ~/se-nginx-test && cd ~/se-nginx-text`
+8. Create a project directory: `mkdir ~/se-nginx-test && cd ~/se-nginx-test`
 9. Clone social-ngix: `git clone https://github.com/TheTinkery/social-nginx.git`
 10. (Optional) If you're going to store your site in GitHub, go create the repo now. Don't create a README in the project for now- just an empty project. This should be a private repository for holding your SocialEngine code.
 11.  Create a local SocialEngine application directory: `mkdir socialengine`. Your *se-nginx-test* project directory should now contain two subdirectories: *social-ngix* and *socialengine*. Change into the *socialengine* directory: `cd socialengine`
 12. (Optional) If you're going to store your SocialEngine site in a private GitHub repository, initialize Git to track file changes. Execute: `git init`
-13. social-nginx includes an empty project structure you can start with. Execute: `cp -R ../social-nginx/`
+13. Social-nginx includes an empty project structure you can start with. Execute: `cp -R ../social-nginx/site-template/. .`. This structure includes a .gitignore that ignores Mac's .DS_Store and also excludes the SocialEngine temporary directory.
+14. Delete the placeholder and extract your site source code (modify the download path if necessary): `cd src && rm index.html && tar xzf ~/Downloads/socialengine.tgz && cd ..`
+15. Delte the placeholder and copy the database backup (modify the download path if necessary): `rm conf/db/cp ~/Downloads/default.sql conf/db/`
 
 
 ### Versioning

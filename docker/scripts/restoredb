@@ -24,7 +24,7 @@ if [ -d "$APP_DB" ]; then
      CREATE DATABASE ${MYSQL_DB}; \
      GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_USER_PW}';"
 
-  for i in `ls ${APP_DB}`; do
+  for i in `ls ${APP_DB}/*.sql`; do
     echo "Loading: ${i}"
     [ -z "$MYSQL_USER_PW" ] || USERPW="-p${MYSQL_USER_PW}"
     mysql -h "${MYSQL_HOST}" -u "$MYSQL_USER" "$USERPW" "$MYSQL_DB" < "${APP_DB}/${i}"
