@@ -1,0 +1,33 @@
+# ./docker-compose.yml
+
+version: '3'
+
+services:
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: yNW4TKgr68wsLA
+  web:
+    image: tinkery/social-nginx:latest
+    container_name: social-nginx
+    environment:
+      SE_MODE: DEVELOPMENT
+      MYSQL_HOST: mariadb
+      MYSQL_ROOT_PW: yNW4TKgr68wsLA
+      MYSQL_USER: socialengine
+      MYSQL_USER_PW: yNW4TKgr68wsLA
+      MYSQL_DB: socialengine
+      GIT_REPO: https://github.com/Your/SocialEngineRepo.git
+      GIT_USERNAME: YourGitUsername
+      GIT_PERSONAL_TOKEN: YourGitPersonalToken
+      GIT_EMAIL: 'yougit@email.com'
+      GIT_NAME: 'Your Name'
+      GIT_BRANCH: master
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    stdin_open: true
+    tty: true

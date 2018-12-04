@@ -1,0 +1,29 @@
+# ./docker-compose.yml
+
+version: '3'
+
+services:
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: yNW4TKgr68wsLA
+  web:
+    image: tinkery/social-nginx:latest
+    container_name: social-nginx
+    environment:
+      SE_MODE: DEVELOPMENT
+      MYSQL_HOST: mariadb
+      MYSQL_ROOT_PW: yNW4TKgr68wsLA
+      MYSQL_USER: socialengine
+      MYSQL_USER_PW: yNW4TKgr68wsLA
+      MYSQL_DB: socialengine
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    volumes:
+      - ../:/app/
+    stdin_open: true
+    tty: true
