@@ -84,7 +84,7 @@ if [ -e /.firstrun ]; then
       if [ -n "$GIT_BRANCH" ]; then
         echo -e "Git branch (GIT_BRANCH): ${GIT_BRANCH}"
         GIT_COMMAND="${GIT_COMMAND} -b ${GIT_BRANCH}"
-      fi https://
+      fi
       if [ -z "$GIT_USERNAME" ] && [ -z "$GIT_PERSONAL_TOKEN" ]; then
         GIT_COMMAND="${GIT_COMMAND} https://${GIT_REPO}"
       else
