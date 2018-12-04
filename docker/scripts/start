@@ -78,7 +78,8 @@ if [ -e /.firstrun ]; then
     if [ -n "$GIT_REPO" ]; then
       echo -e "## Loading source from (GIT_REPO): ${GIT_REPO}"
       # remove existing files
-      rm -rf "${APP_HOME}/*"
+      cd /
+      rm -rf ${APP_HOME}/*
       # Setup the Git command
       GIT_COMMAND='git clone'
       if [ -n "$GIT_BRANCH" ]; then
