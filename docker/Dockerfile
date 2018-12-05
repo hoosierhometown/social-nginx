@@ -294,13 +294,4 @@ EXPOSE 443 80
 
 RUN touch /.firstrun
 
-# Todo:
-# Compare start.sh to old one
-# work in init and database scripts
-# figure out database image
-# figure out compose
-# run local
-# update git, push container
-# Run in cloud
-
 CMD ["/start"]
