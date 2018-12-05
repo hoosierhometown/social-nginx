@@ -37,64 +37,28 @@ Running SocialEngine in social-nginx the first time requires some setup. You mus
 11.  Create a local SocialEngine application directory: `mkdir socialengine`. Your *se-nginx-test* project directory should now contain two subdirectories: *social-ngix* and *socialengine*. Change into the *socialengine* directory: `cd socialengine`
 12. (Optional) If you're going to store your SocialEngine site in a private GitHub repository, initialize Git to track file changes. Execute: `git init`
 13. Social-nginx includes an empty project structure you can start with. Execute: `cp -R ../social-nginx/site-template/. .`. This structure includes a .gitignore that ignores Mac's .DS_Store and also excludes the SocialEngine temporary directory.
-14. Delete the placeholder and extract your site source code (modify the download path if necessary): `cd src && rm index.html && tar xzf ~/Downloads/socialengine.tgz && cd ..`
-15. Delte the placeholder and copy the database backup (modify the download path if necessary): `rm conf/db/cp ~/Downloads/default.sql conf/db/`
+14. Extract your site source code (modify the download path if necessary): `cd src && tar xzf ~/Downloads/socialengine.tgz && cd ..`
+15. Copy the database backup (modify the download path if necessary): `cp ~/Downloads/default.sql conf/db/`. Your project should now be ready to run.
+16. Pre-fetch a couple Docker images: `docker pull mariadb && docker pull tinkery/social-nginx`
+17. Change into the dev directory `cd dev`
+18. Note: We're going to run a local MySQL database (technically, it's MariaDB). The configuration includes a root password and a user and password for a SocialEngine database. This is a development only database instance. You can leave these as-is, or change to your preference by editing docker-compose.yml. It isn't necessary that this matches your database.
+19. Make the scripts excecutable: `chmod +x start stop enter enterdb`
+20. Execute `./start` to launch the mariadb and social-nginx containers using the SocialEngine code you have set up. Startup may take a couple minutes. If you execute `docker ps` you should see the two containers running. If you experience trouble, you can execute `./stop` to shutdown these instances, then execute `docker-compose up` to see startup messages from the containers.
+21. Executing `./enter` will give you a shell inside the social-nginx container.  Executing `./enterdb` will give you a shell inside the mariadb container.
+22. Launch your browser to access your site at http://localhost.
+23. You can edit your site files directly in the src directory. If you make changes through the admin panel (such as installing plugins) these changes will be in your local src directory as well. Note that you may need to tweak directory permissions in your docker container when installing plugins or themes. I will work on fixing this up later.
+24. If you make changes that impact your database (most do) you need to export your database so it will be saved in source control. To do this, execute: `docker exec social-nginx backupdb`. This will backup the database to conf/db/default.sql.
+25. Shut down: `./stop`
+26. (Optional) If storing your site in a private GitHub project, you can push it now:
+This prevents file mode changes from being tracked by Git (only need to execute this once):
+`git config --global push.default simple
+git config --global core.fileMode false`
+Then add, commit and push your changes
+`cd ..
+git add -A
+git commit -a -m "Initial commit"
+git push origin master`
 
+Now it is extemely simple to run your SocialEngine site anywhere. Just clone your repository, cd into the dev directory, then run ./start. Developers can work on feature branches in total isolation, allowing you to merge the changes when they've been completed and tested.
 
-### Versioning
-| Docker Tag | Git Release | Nginx Version | PHP Version | Alpine Version |
-|-----|-------|-----|--------|--------|
-| latest/1.5.7 | Master Branch |1.14.0 | 7.2.10 | 3.7 |
-
-For other tags please see: [versioning](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/versioning.md)
-
-### Links
-- [https://gitlab.com/ric_harvey/nginx-php-fpm](https://gitlab.com/ric_harvey/nginx-php-fpm)
-- [https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/](https://registry.hub.docker.com/u/richarvey/nginx-php-fpm/)
-
-## Quick Start
-To pull from docker hub:
-```
-docker pull richarvey/nginx-php-fpm:latest
-```
-### Running
-To simply run the container:
-```
-sudo docker run -d richarvey/nginx-php-fpm
-```
-To dynamically pull code from git when starting:
-```
-docker run -d -e 'GIT_EMAIL=email_address' -e 'GIT_NAME=full_name' -e 'GIT_USERNAME=git_username' -e 'GIT_REPO=github.com/project' -e 'GIT_PERSONAL_TOKEN=<long_token_string_here>' richarvey/nginx-php-fpm:latest
-```
-
-You can then browse to ```http://<DOCKER_HOST>``` to view the default install files. To find your ```DOCKER_HOST``` use the ```docker inspect``` to get the IP address (normally 172.17.0.2)
-
-For more detailed examples and explanations please refer to the documentation.
-## Documentation
-
-- [Building from source](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/building.md)
-- [Versioning](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/versioning.md)
-- [Config Flags](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/config_flags.md)
-- [Git Auth](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/git_auth.md)
-  - [Personal Access token](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/git_auth.md#personal-access-token)
-  - [SSH Keys](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/git_auth.md#ssh-keys)
-- [Git Commands](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/git_commands.md)
- - [Push](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/git_commands.md#push-code-to-git)
- - [Pull](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/git_commands.md#pull-code-from-git-refresh)
-- [Repository layout / webroot](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/repo_layout.md)
- - [webroot](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/repo_layout.md#src--webroot)
-- [User / Group Identifiers](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/UID_GID_Mapping.md)
-- [Custom Nginx Config files](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/nginx_configs.md)
- - [REAL IP / X-Forwarded-For Headers](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/nginx_configs.md#real-ip--x-forwarded-for-headers)
-- [Scripting and Templating](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/scripting_templating.md)
- - [Environment Variables](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/scripting_templating.md#using-environment-variables--templating)
-- [Lets Encrypt Support](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/lets_encrypt.md)
- - [Setup](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/lets_encrypt.md#setup)
- - [Renewal](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/lets_encrypt.md#renewal)
-- [PHP Modules](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/php_modules.md)
-- [Xdebug](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/xdebug.md)
-- [Logging and Errors](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/logs.md)
-
-## Guides
-- [Running in Kubernetes](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/guides/kubernetes.md)
-- [Using Docker Compose](https://gitlab.com/ric_harvey/nginx-php-fpm/blob/master/docs/guides/docker_compose.md)
+Note: dev/fromgit/ contains a docker-compose.yml file that includes repository info. If you edit this file to set your Git account details, then run `docker compose up -d` in this directory, social-nginx will fetch a copy of your SocialEngine site from Github when it launches. You must set up a personal access token for this to work (it is easy to set this up in Github). When you launch this way, you are not working on a local copy of your code. This mode is especially useful for running your site in production or staging, or on a Docker or Kubernetes container in the cloud. When running in this mode, `docker exec social-nginx pull` will fetch updates from the repository, and `docker exec social-nginx push` will push changes from the docker image to the repository.

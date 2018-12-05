@@ -1,19 +1,19 @@
 #!/bin/bash
 
-if [ -n "$MYSQL_HOST" ]; then
-  echo -n 'MYSQL_HOST not defined'
+if [ -z "$MYSQL_HOST" ]; then
+  echo 'MYSQL_HOST not defined'
   exit 1
 fi
-if [ -n "$MYSQL_USER" ]; then
-  echo -n 'MYSQL_USER not defined'
+if [ -z "$MYSQL_USER" ]; then
+  echo 'MYSQL_USER not defined'
   exit 1
 fi
-if [ -n "$MYSQL_DB" ]; then
-  echo -n 'MYSQL_DB not defined'
+if [ -z "$MYSQL_DB" ]; then
+  echo 'MYSQL_DB not defined'
   exit 1
 fi
 
-echo -n "## Backing up Database to ${APP_DB}/defalt.sql"
+echo "## Backing up Database to ${APP_DB}/defalt.sql"
 if [ -d "$APP_DB" ]; then
   #mysqldump -u socialengine -pyNW4TKgr68wsLA socialengine  > socialengine.sql
   [ -z "$MYSQL_USER_PW" ] || USERPW="-p${MYSQL_USER_PW}"

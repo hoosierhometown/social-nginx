@@ -27,7 +27,7 @@ if [ -d "$APP_DB" ]; then
   for i in `ls ${APP_DB}/*.sql`; do
     echo "Loading: ${i}"
     [ -z "$MYSQL_USER_PW" ] || USERPW="-p${MYSQL_USER_PW}"
-    mysql -h "${MYSQL_HOST}" -u "$MYSQL_USER" "$USERPW" "$MYSQL_DB" < "${APP_DB}/${i}"
+    mysql -h "${MYSQL_HOST}" -u "$MYSQL_USER" "$USERPW" "$MYSQL_DB" < "${i}"
     #mysql -u socialengine -pyNW4TKgr68wsLA socialengine < socialengine.sql
   done
 
