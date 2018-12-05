@@ -45,15 +45,13 @@ Execute: `mysqldump -h YOUR_MYSQL_HOST -u root -pROOT_PASSWORD YOUR_DATABASE_NAM
 25. If you make changes that impact your database (most do) you need to export your database so it will be saved in source control. To do this, execute: `docker exec social-nginx backupdb`. This will backup the database to conf/db/default.sql.
 26. Shut down: `./stop`
 27. (Optional) If storing your site in a private GitHub project, you can push it now:
-This prevents file mode changes from being tracked by Git (only need to execute this once):
 
+This prevents file mode changes from being tracked by Git (only need to execute this once):
 ```
 git config --global push.default simple
 git config --global core.fileMode false
 ```
-
 Then add, commit and push your changes
-
 ```
 cd ..
 git add -A
