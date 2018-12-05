@@ -1,9 +1,12 @@
 ## Overview
 This is a Docker image / container for running SocialEngine on NGINX with PHP-FPM.
+
 This repository does **not** contain any SocialEngine components. Rather, it is a container configured to run SocialEngine and support DevOps workflows. It is designed to work with a SocialEngine instance (code and database) stored in Github. Note that because SocialEngine is a commercial product, it should not be stored in a public repository. Github supports private repositories for individuals and organizations, though you need a paid account to take advantage of them. You can test this without a Github repository.
+
 This image supports modern DevOps workflows around SE, using a Docker container for the application environment, and loading your SocialEngine site code and database from Github. Using Docker Compose, you can run a fully self-contained development environment on your laptop, push changes to source control and have them instantly up and running on a container-based server. I've currently got this running on the Google Cloud Platform Compute Engine, using a VPS that is initialized with the social-nginx image.
+
 This initial version is a work in progress. I currently don't have SSL set up (though that shouldn't be difficult). I'm currently in early development on a SocialEngine site so I'll be updating this as I go. I would welcome others to fork this repository, and contribute your improvements through pull requests. If you experience problems, you may also open an issue on the Github project page.
-Next steps:
+### Next steps
 * Implement SSL
 * Optimize and clean up NGINX & PHP config. Perhaps break PHP-FPM into a separate container? Make sure there's no rewrite issues.
 * Incorporate other PHP modules as needed
