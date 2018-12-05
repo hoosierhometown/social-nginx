@@ -32,7 +32,7 @@ Execute: `mysqldump -h YOUR_MYSQL_HOST -u root -pROOT_PASSWORD YOUR_DATABASE_NAM
 12.  Create a local SocialEngine application directory: `mkdir socialengine`. Your *se-nginx-test* project directory should now contain two subdirectories: *social-ngix* and *socialengine*. Change into the *socialengine* directory: `cd socialengine`
 13. (Optional) If you're going to store your SocialEngine site in a private GitHub repository, initialize Git to track file changes. Execute: `git init`
 14. Social-nginx includes an empty project structure you can start with. Execute: `cp -R ../social-nginx/site-template/. .`. This structure includes a .gitignore that ignores Mac's .DS_Store and also excludes the SocialEngine temporary directory.
-15. Extract your site source code (modify the download path if necessary): `cd src && tar xzf ~/Downloads/socialengine.tgz && cd ..`
+15. Extract your site source code (modify the download path if necessary): `tar xzf ~/Downloads/socialengine.tgz -C src/`
 16. Copy the database backup (modify the download path if necessary): `cp ~/Downloads/default.sql conf/db/`. Your project should now be ready to run.
 17. Pre-fetch a couple Docker images: `docker pull mariadb && docker pull tinkery/social-nginx`
 18. Change into the dev directory `cd dev`
