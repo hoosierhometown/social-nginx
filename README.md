@@ -60,21 +60,21 @@ Execute: `mysqldump -h YOUR_MYSQL_HOST -u root -pROOT_PASSWORD YOUR_DATABASE_NAM
 27. (Optional) If storing your site in a private GitHub project, you can push it now:
 This prevents file mode changes from being tracked by Git (only need to execute this once):
 
-...`git config --global push.default simple
+```
+git config --global push.default simple
+git config --global core.fileMode false
+```
 
-git config --global core.fileMode false`
+Then add, commit and push your changes
 
-...Then add, commit and push your changes
-
-...`cd ..
-
+```
+cd ..
 git add -A
-
 git commit -a -m "Initial commit"
-
 git push origin master`
+```
 
-Now it is extemely simple to run your SocialEngine site anywhere. Just clone your repository, cd into the dev directory, then run ./start. Developers can work on feature branches in total isolation, allowing you to merge the changes when they've been completed and tested.
+Now it's extremely simple to run your SocialEngine site anywhere. Just clone your repository, cd into the dev directory, then run ./start. Developers can work on feature branches in total isolation, allowing you to merge the changes when they've been completed and tested.
 
 Note: dev/fromgit/ contains a docker-compose.yml file that includes repository info. If you edit this file to set your Git account details, then run `docker compose up -d` in this directory, social-nginx will fetch a copy of your SocialEngine site from Github when it launches. You must set up a personal access token for this to work (it is easy to set this up in Github). When you launch this way, you are not working on a local copy of your code. This mode is especially useful for running your site in production or staging, or on a Docker or Kubernetes container in the cloud. When running in this mode, `docker exec social-nginx pull` will fetch updates from the repository, and `docker exec social-nginx push` will push changes from the docker image to the repository.
 
