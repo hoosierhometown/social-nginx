@@ -60,14 +60,14 @@ Execute: `mysqldump -h YOUR_MYSQL_HOST -u root -pROOT_PASSWORD YOUR_DATABASE_NAM
 27. (Optional) If storing your site in a private GitHub project, you can push it now:
 This prevents file mode changes from being tracked by Git (only need to execute this once):
 
-...```
+⋅⋅⋅```shell
 git config --global push.default simple
 git config --global core.fileMode false
 ```
 
-...Then add, commit and push your changes
+⋅⋅⋅Then add, commit and push your changes
 
-...```
+⋅⋅⋅```shell
 cd ..
 git add -A
 git commit -a -m "Initial commit"
