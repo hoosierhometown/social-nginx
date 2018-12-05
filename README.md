@@ -1,4 +1,4 @@
-## Overview
+# Overview
 This is a Docker image / container for running SocialEngine on NGINX with PHP-FPM.
 
 This repository does **not** contain any SocialEngine components. Rather, it is a container configured to run SocialEngine and support DevOps workflows. It is designed to work with a SocialEngine instance (code and database) stored in Github. Note that because SocialEngine is a commercial product, it should not be stored in a public repository. Github supports private repositories for individuals and organizations, though you need a paid account to take advantage of them. You can test this without a Github repository.
@@ -6,7 +6,7 @@ This repository does **not** contain any SocialEngine components. Rather, it is 
 This image supports modern DevOps workflows around SE, using a Docker container for the application environment, and loading your SocialEngine site code and database from Github. Using Docker Compose, you can run a fully self-contained development environment on your laptop, push changes to source control and have them instantly up and running on a container-based server. I've currently got this running on the Google Cloud Platform Compute Engine, using a VPS that is initialized with the social-nginx image.
 
 This initial version is a work in progress. I currently don't have SSL set up (though that shouldn't be difficult). I'm currently in early development on a SocialEngine site so I'll be updating this as I go. I would welcome others to fork this repository, and contribute your improvements through pull requests. If you experience problems, you may also open an issue on the Github project page.
-### Next steps
+## Next steps
 * Implement SSL
 * Optimize and clean up NGINX & PHP config. Perhaps break PHP-FPM into a separate container? Make sure there's no rewrite issues.
 * Incorporate other PHP modules as needed
@@ -19,16 +19,16 @@ This initial version is a work in progress. I currently don't have SSL set up (t
 * Update social-nginx docs.
 
 This will result in full Continuous Integration and Delivery of even large SocialEngine installations, while enabling developers to easily work on isolated feature branches.
-### Licensing
+## Licensing
 This leads to an important suggestion for the SocialEngine team. SocialEngine is licensed in an old-school "paid script" model where everybody hacks on one instance of the script running on some VPS. To support this old model SE allows only *one* developer instance. Today, with modern DevOps and CI/CD multiple developers should be able to work on multiple feature branches simultaneously, in isolation. Developers should be able to run their test environments on their laptops, or in private cloud instances. Then these feature branches can be unit-tested, code-reviewed and pulled/merged into a staging/integration instance and finally pushed to production. This is modern best-practices, but SE's licensing model forbids this, requiring multiple expensive production licenses to legally enable it.
-### Improving social-nginx
+## Improving social-nginx
 If you have improvements or suggestions please open an issue or pull request on the GitHub project page.
-## Quick Test
+# Quick Test
 For a quick smoke-test of social-nginx (without SocialEngine):
 1. [Install Docker Desktop](https://www.docker.com/products/docker-desktop "Docker Desktop")
 2. Open a terminal window and execute `docker run -p 80:80 tinkery/social-nginx`
 3. Open a browser window to http://localhost. PHP-Info will be displayed.
-## Running SocialEngine
+# Running SocialEngine
 Running SocialEngine in social-nginx the first time requires some setup. You must have shell access to your instance to set this up.
 1. Install SocialEngine (or use your existing install- these instructions won't modify it). I haven't tested on a SocialEngine trial, but I don't see why it wouldn't work. Verify that it is running.
 2. Temporarily switch SocialEngine to Development mode through the admin console.
