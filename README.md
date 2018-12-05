@@ -6,21 +6,8 @@ This repository does **not** contain any SocialEngine components. Rather, it is 
 This image supports modern DevOps workflows around SE, using a Docker container for the application environment, and loading your SocialEngine site code and database from Github. Using Docker Compose, you can run a fully self-contained development environment on your laptop, push changes to source control and have them instantly up and running on a container-based server. I've currently got this running on the Google Cloud Platform Compute Engine, using a VPS that is initialized with the social-nginx image.
 
 This initial version is a work in progress. I currently don't have SSL set up (though that shouldn't be difficult). I'm currently in early development on a SocialEngine site so I'll be updating this as I go. I would welcome others to fork this repository, and contribute your improvements through pull requests. If you experience problems, you may also open an issue on the Github project page.
-## Next steps
-* Implement SSL
-* Optimize and clean up NGINX & PHP config. Perhaps break PHP-FPM into a separate container? Make sure there's no rewrite issues.
-* Incorporate other PHP modules as needed
-* Optimize & harden directory permissions for dev & production.
-* Test on GCP Kubernetes Engine
-* Implement a test harness for automated testing
-* Implement a database migration tool, supporting continuous delivery all the way into production, including schema and data changes.
-* Automate CI/CD using Jenkins or a cloud DevOps pipeline
-* Test on AWS and Azure
-* Update social-nginx docs.
-
-This will result in full Continuous Integration and Delivery of even large SocialEngine installations, while enabling developers to easily work on isolated feature branches.
 ## Licensing
-This leads to an important suggestion for the SocialEngine team. SocialEngine is licensed in an old-school "paid script" model where everybody hacks on one instance of the script running on some VPS. To support this old model SE allows only *one* developer instance. Today, with modern DevOps and CI/CD multiple developers should be able to work on multiple feature branches simultaneously, in isolation. Developers should be able to run their test environments on their laptops, or in private cloud instances. Then these feature branches can be unit-tested, code-reviewed and pulled/merged into a staging/integration instance and finally pushed to production. This is modern best-practices, but SE's licensing model forbids this, requiring multiple expensive production licenses to legally enable it.
+SocialEngine is licensed in an old-school "paid script" model where everybody hacks on one instance of the script running on some VPS. To support this old model SE allows only *one* developer instance. Today, with modern DevOps and CI/CD multiple developers should be able to work on multiple feature branches simultaneously, in isolation. Developers should be able to easily and quickly run their dev environments on their laptops, or in private cloud instances. Then these feature branches can be unit-tested, code-reviewed and pulled/merged into a staging/integration instance and finally pushed to production. This is modern best-practices, but SE's licensing model forbids this, requiring multiple expensive production licenses to legally enable it. I would highly encourage SE to adopt a licensing approach that doesn't discourage developers from using modern, efficient DevOps.
 ## Improving social-nginx
 If you have improvements or suggestions please open an issue or pull request on the GitHub project page.
 # Quick Test
@@ -79,3 +66,16 @@ Now it's extremely simple to run your SocialEngine site anywhere. Just clone you
 Note: dev/fromgit/ contains a docker-compose.yml file that includes repository info. If you edit this file to set your Git account details, then run `docker compose up -d` in this directory, social-nginx will fetch a copy of your SocialEngine site from Github when it launches. You must set up a personal access token for this to work (it is easy to set this up in Github). When you launch this way, you are not working on a local copy of your code. This mode is especially useful for running your site in production or staging, or on a Docker or Kubernetes container in the cloud. When running in this mode, `docker exec social-nginx pull` will fetch updates from the repository, and `docker exec social-nginx push` will push changes from the docker image to the repository.
 
 Note 2: The .gitignore causes github to exclude SocialEngine's temporary directory. It's my presumption that this directory is only for transient objects. However, I wasn't sure if SE was smart enough to always re-create the directory structure it needs in temporary. So the startup script recreates the structure here that existed on my installation. If anybody knows what I should do differently here - either files I need to preserve in temporary, or if SE will automatically create any directories it needs here, let me know and I can clean this up.
+## Next steps
+* Implement SSL
+* Optimize and clean up NGINX & PHP config. Perhaps break PHP-FPM into a separate container? Make sure there's no rewrite issues.
+* Incorporate other PHP modules as needed
+* Optimize & harden directory permissions for dev & production.
+* Test on GCP Kubernetes Engine
+* Implement a test harness for automated testing
+* Implement a database migration tool, supporting continuous delivery all the way into production, including schema and data changes.
+* Automate CI/CD using Jenkins or a cloud DevOps pipeline
+* Test on AWS and Azure
+* Update social-nginx docs.
+
+This will result in full Continuous Integration and Delivery of even large SocialEngine installations, while enabling developers to easily work on isolated feature branches.
