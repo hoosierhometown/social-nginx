@@ -19,9 +19,9 @@ This initial version is a work in progress. I currently don't have SSL set up (t
 * Update social-nginx docs.
 
 This will result in full Continuous Integration and Delivery of even large SocialEngine installations, while enabling developers to easily work on isolated feature branches.
-*** Licensing
+### Licensing
 This leads to an important suggestion for the SocialEngine team. SocialEngine is licensed in an old-school "paid script" model where everybody hacks on one instance of the script running on some VPS. To support this old model SE allows only *one* developer instance. Today, with modern DevOps and CI/CD multiple developers should be able to work on multiple feature branches simultaneously, in isolation. Developers should be able to run their test environments on their laptops, or in private cloud instances. Then these feature branches can be unit-tested, code-reviewed and pulled/merged into a staging/integration instance and finally pushed to production. This is modern best-practices, but SE's licensing model forbids this, requiring multiple expensive production licenses to legally enable it.
-
+### Improving social-nginx
 If you have improvements or suggestions please open an issue or pull request on the GitHub project page.
 ## Quick Test
 For a quick smoke-test of social-nginx (without SocialEngine):
