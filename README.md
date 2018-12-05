@@ -21,9 +21,9 @@ Running SocialEngine in social-nginx the first time requires some setup. You mus
 2. Temporarily switch SocialEngine to Development mode through the admin console.
 3. Launch a shell (ie SSH) into your SocialEngine host.
 4. Execute `cd /your/SocialEngine/root/ && tar czf ~/socialengine.tgz .`
-5. You can set your site back to production mode.
-6. Create a backup of your database. Note there is no space between -p and your password.
+5. Create a backup of your database. Note there is no space between -p and your password.
 Execute: `mysqldump -h YOUR_MYSQL_HOST -u root -pROOT_PASSWORD YOUR_DATABASE_NAME > ~/default.sql`
+6. You can set your site back to production mode.
 7. Download socialengine.tgz and default.sql from the home (~/) directory to your local computer. These instructions presume these are downloaded into ~/Downloads/socialengine.tgz and ~/Downloads/default.sql, but if they're in a different location you can just adjust the paths.
 8. [install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) if you don't have it.
 9. Create a project directory: `mkdir ~/se-nginx-test && cd ~/se-nginx-test`
